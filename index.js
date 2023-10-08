@@ -4,6 +4,7 @@ require('dotenv').config();
 const path = require('node:path');
 const fs = require('node:fs/promises');
 const express = require('express');
+const compression = require('compression');
 const vhost = require('vhost');
 const yargs = require('yargs/yargs');
 const { hideBin } = require('yargs/helpers');
@@ -69,6 +70,7 @@ const {
 } = argv;
 
 const app = express();
+app.use(compression());
 
 if (silent) {
   logger.setSilent(silent);
