@@ -9,8 +9,10 @@ const yargs = require('yargs/yargs');
 const { hideBin } = require('yargs/helpers');
 
 const logger = require('./lib/logger');
+const pjson = require('./package.json');
 
 const { argv } = yargs(hideBin(process.argv))
+  .version(pjson.version)
   .options('port', {
     type: 'number',
     demandOption: true,
