@@ -136,8 +136,16 @@ app.use(express.static(workDir));
 app.use((req, res) => {
   res.status(404).json({
     status: 404,
-    path: req.path,
     msg: 'Not found',
+    vhost: req.vhost.hostname,
+    url: req.originalUrl,
+  });
+
+  logger.log({
+    ts: new Date(),
+    msg: '404 NOT FOUND',
+    vhost: req.vhost.hostname,
+    url: req.originalUrl,
   });
 });
 
