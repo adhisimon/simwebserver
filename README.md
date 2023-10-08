@@ -17,5 +17,9 @@ Options:
   --pidfile                                                             [string]
 ```
 
+## Virtual Host Support
+To use different files for different virtual host (VHOST, SERVER NAME),
+just create a subdirectory with the same name as virtual host on WORK DIR.
+
 ## Changelog
 See [CHANGELOG.MD](./CHANGELOG.md).
