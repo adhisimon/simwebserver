@@ -44,6 +44,10 @@ const { argv } = yargs(hideBin(process.argv))
     default: !!process.env.SWS_SILENT,
     describe: 'also obey SWS_SILENT env',
   })
+  .options('pidfile', {
+    type: 'string',
+    default: process.env.SWS_PIDFILE,
+  })
   .check((args) => {
     if (Array.isArray(args.port)) {
       return 'Too many arguments: port';
@@ -63,6 +67,14 @@ const { argv } = yargs(hideBin(process.argv))
 
     if (Array.isArray(args['terminate-after-seconds'])) {
       return 'Too many arguments: terminate-after-seconds';
+    }
+
+    if (Array.isArray(args.silent)) {
+      return 'Too many arguments: silent';
+    }
+
+    if (Array.isArray(args.pidfile)) {
+      return 'Too many arguments: pidfile';
     }
 
     return true;
@@ -132,11 +144,15 @@ app.use((req, res) => {
     await logger.setAmqp(amqpUrl, amqpExchange);
   }
 
-  app.listen(port, () => {
+  app.listen(port, async () => {
     logger.log({
       ts: new Date(),
       msg: 'Ready to served',
     });
+
+    if (argv.pidfile) {
+      await fs.writeFile(argv.pidfile, process.pid.toString());
+    }
   })
     .on('error', (e) => {
       // eslint-disable-next-line no-console
