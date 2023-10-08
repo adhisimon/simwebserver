@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "postversion": "git push && git push --tags",
     "version": "auto-changelog -p && git add CHANGELOG.md",
-    "build-linux-x64": "pkg --targets node18-linux-x64 --output dist/simwebserver-linux-x64 --compress Brotli index.js"
+    "build": "pkg --targets linux,win,mac --output dist/simwebserver --compress Brotli index.js",
+    "build-linux-x64": "pkg --targets node18-linux-x64 --output dist/simwebserver-linux --compress Brotli index.js"
   },
   "repository": {
     "type": "git",
