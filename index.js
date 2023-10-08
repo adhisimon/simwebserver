@@ -22,12 +22,12 @@ const { argv } = yargs(hideBin(process.argv))
   .options('work-dir', {
     type: 'string',
     default: process.env.SWS_WORK_DIR || 'public',
-    describe: 'also obey SMS_WORK_DIR env',
+    describe: 'also obey SWS_WORK_DIR env',
   })
   .options('terminate-after-seconds', {
     type: 'number',
     default: Number(process.env.SWS_TERMINATE_AFTER_SECONDS) || 0,
-    describe: 'also obey SMS_TERMINATE_AFTER_SECONDS env',
+    describe: 'also obey SWS_TERMINATE_AFTER_SECONDS env',
   })
   .options('amqp-url', {
     type: 'string',
