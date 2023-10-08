@@ -1,6 +1,6 @@
 {
   "name": "simwebserver",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Simple web server writen in node.js to serve static file supporting multiple virtual host",
   "main": "index.js",
   "scripts": {
