@@ -16,7 +16,7 @@ const { argv } = yargs(hideBin(process.argv))
   .version(pjson.version)
   .options('port', {
     type: 'number',
-    default: process.env.SWS_PORT || 8080,
+    default: Number(process.env.SWS_PORT) || 8080,
   })
   .options('work-dir', {
     type: 'string',
@@ -24,7 +24,7 @@ const { argv } = yargs(hideBin(process.argv))
   })
   .options('terminate-after-seconds', {
     type: 'number',
-    default: process.env.SWS_TERMINATE_AFTER_SECONDS || 0,
+    default: Number(process.env.SWS_TERMINATE_AFTER_SECONDS) || 0,
   })
   .options('amqp-url', {
     type: 'string',
