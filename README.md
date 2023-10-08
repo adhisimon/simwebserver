@@ -16,3 +16,6 @@ Options:
   --silent                   also obey SWS_SILENT env [boolean] [default: false]
   --pidfile                                                             [string]
 ```
+
+## Changelog
+See [CHANGELOG.MD](./CHANGELOG.md).
