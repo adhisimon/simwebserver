@@ -110,9 +110,9 @@ if (terminateAfterSeconds) {
 
 app.use(vhost(/.+/, async (req, res, next) => {
   try {
-    const vhostDirStats = await fs.stat(path.join(workDir, req.vhost.hostname));
+    const vhostDirStats = await fs.stat(path.join(workDir, req.vhost?.hostname));
     if (vhostDirStats.isDirectory()) {
-      req.url = path.join(req.vhost.hostname, req.path);
+      req.url = path.join(req.vhost?.hostname, req.path);
     }
   } catch (e) {
     //
@@ -123,9 +123,9 @@ app.use(vhost(/.+/, async (req, res, next) => {
     pid: process.pid,
     msg: 'Got a request',
     remoteAddress: req.ip,
-    vhost: req.vhost.hostname,
+    vhost: req.vhost?.hostname,
     url: req.originalUrl,
-    translatedUrl: path.join(req.vhost.hostname, req.url),
+    translatedUrl: path.join(req.vhost?.hostname, req.originalUrl),
   });
 
   next();
@@ -137,14 +137,14 @@ app.use((req, res) => {
   res.status(404).json({
     status: 404,
     msg: 'Not found',
-    vhost: req.vhost.hostname,
+    vhost: req.vhost?.hostname,
     url: req.originalUrl,
   });
 
   logger.log({
     ts: new Date(),
     msg: '404 NOT FOUND',
-    vhost: req.vhost.hostname,
+    vhost: req.vhost?.hostname,
     url: req.originalUrl,
   });
 });
