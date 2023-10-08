@@ -16,24 +16,27 @@ const { argv } = yargs(hideBin(process.argv))
   .version(pjson.version)
   .options('port', {
     type: 'number',
-    demandOption: true,
-    default: 8080,
+    default: process.env.SWS_PORT || 8080,
   })
   .options('work-dir', {
     type: 'string',
-    default: 'public',
+    default: process.env.SWS_WORK_DIR || 'public',
   })
   .options('terminate-after-seconds', {
     type: 'number',
+    default: process.env.SWS_TERMINATE_AFTER_SECONDS || 0,
   })
   .options('amqp-url', {
     type: 'string',
+    default: process.env.SWS_AMQP_URL,
   })
   .options('amqp-exchange', {
     type: 'string',
+    default: process.env.SWS_AMQP_EXCHANGE,
   })
   .options('silent', {
     type: 'boolean',
+    default: !!process.env.SWS_SILENT,
   })
   .check((args) => {
     if (Array.isArray(args.port)) {
