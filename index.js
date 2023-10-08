@@ -17,26 +17,32 @@ const { argv } = yargs(hideBin(process.argv))
   .options('port', {
     type: 'number',
     default: Number(process.env.SWS_PORT) || 8080,
+    describe: 'also obey SWS_PORT env',
   })
   .options('work-dir', {
     type: 'string',
     default: process.env.SWS_WORK_DIR || 'public',
+    describe: 'also obey SMS_WORK_DIR env',
   })
   .options('terminate-after-seconds', {
     type: 'number',
     default: Number(process.env.SWS_TERMINATE_AFTER_SECONDS) || 0,
+    describe: 'also obey SMS_TERMINATE_AFTER_SECONDS env',
   })
   .options('amqp-url', {
     type: 'string',
     default: process.env.SWS_AMQP_URL,
+    describe: 'also obey SWS_AMQP_URL env',
   })
   .options('amqp-exchange', {
     type: 'string',
     default: process.env.SWS_AMQP_EXCHANGE,
+    describe: 'also obey SWS_AMQP_EXCHANGE env',
   })
   .options('silent', {
     type: 'boolean',
     default: !!process.env.SWS_SILENT,
+    describe: 'also obey SWS_SILENT env',
   })
   .check((args) => {
     if (Array.isArray(args.port)) {
