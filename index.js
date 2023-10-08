@@ -101,6 +101,7 @@ if (terminateAfterSeconds) {
   setTimeout(() => {
     logger.log({
       ts: new Date(),
+      pid: process.pid,
       msg: `Terminated after running ${terminateAfterSeconds} secs`,
     });
     process.exit(0);
@@ -119,6 +120,7 @@ app.use(vhost(/.+/, async (req, res, next) => {
 
   logger.log({
     ts: new Date(),
+    pid: process.pid,
     msg: 'Got a request',
     remoteAddress: req.ip,
     vhost: req.vhost.hostname,
@@ -147,6 +149,7 @@ app.use((req, res) => {
   app.listen(port, async () => {
     logger.log({
       ts: new Date(),
+      pid: process.pid,
       msg: 'Ready to served',
     });
 
@@ -157,6 +160,8 @@ app.use((req, res) => {
     .on('error', (e) => {
       // eslint-disable-next-line no-console
       console.log('EXCEPTION');
+      // eslint-disable-next-line no-console
+      console.log(`PID: ${process.pid}`);
       // eslint-disable-next-line no-console
       console.log(`ECODE: ${e.code}`);
       // eslint-disable-next-line no-console
