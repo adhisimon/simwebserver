@@ -133,3 +133,5 @@ build-config.json
 private.pem
 public.pem
 license.dat
+private.json
+public.json

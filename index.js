@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const NEED_LICENSE = false;
+const NEED_LICENSE = true;
 
 require('dotenv').config();
 const path = require('node:path');
@@ -57,9 +57,19 @@ const { argv } = yargs(hideBin(process.argv))
   })
   .options('generate-build-json', {
     type: 'boolean',
+    hidden: NEED_LICENSE,
+  })
+  .options('generate-private-key-json', {
+    type: 'boolean',
+    hidden: NEED_LICENSE,
+  })
+  .options('generate-public-key-json', {
+    type: 'boolean',
+    hidden: NEED_LICENSE,
   })
   .options('generate-license', {
     type: 'string',
+    hidden: NEED_LICENSE,
   })
   .check((args) => {
     if (Array.isArray(args.port)) {
@@ -103,6 +113,8 @@ const {
   silent,
   dumpMachineId,
   generateBuildJson,
+  generatePrivateKeyJson,
+  generatePublicKeyJson,
   generateLicense,
 } = argv;
 
@@ -182,6 +194,20 @@ app.use((req, res) => {
     const publicKey = (await fs.readFile('public.pem')).toString();
     // eslint-disable-next-line no-console
     console.log(JSON.stringify({ privateKey, publicKey }, null, 2));
+    process.exit(0);
+  }
+
+  if (generatePrivateKeyJson) {
+    const privateKey = (await fs.readFile('private.pem')).toString();
+    // eslint-disable-next-line no-console
+    console.log(JSON.stringify({ key: privateKey }, null, 2));
+    process.exit(0);
+  }
+
+  if (generatePublicKeyJson) {
+    const publicKey = (await fs.readFile('public.pem')).toString();
+    // eslint-disable-next-line no-console
+    console.log(JSON.stringify({ key: publicKey }, null, 2));
     process.exit(0);
   }
 
