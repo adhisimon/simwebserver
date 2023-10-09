@@ -7,6 +7,7 @@ const express = require('express');
 const compression = require('compression');
 const vhost = require('vhost');
 const yargs = require('yargs/yargs');
+const { machineId } = require('node-machine-id');
 const { hideBin } = require('yargs/helpers');
 
 const logger = require('./lib/logger');
@@ -48,6 +49,9 @@ const { argv } = yargs(hideBin(process.argv))
     type: 'string',
     default: process.env.SWS_PIDFILE,
   })
+  .options('dump-machine-id', {
+    type: 'boolean',
+  })
   .check((args) => {
     if (Array.isArray(args.port)) {
       return 'Too many arguments: port';
@@ -88,6 +92,7 @@ const {
   amqpUrl,
   amqpExchange,
   silent,
+  dumpMachineId,
 } = argv;
 
 const app = express();
@@ -150,6 +155,12 @@ app.use((req, res) => {
 });
 
 (async () => {
+  if (dumpMachineId) {
+    // eslint-disable-next-line no-console
+    console.log(await machineId());
+
+    process.exit(0);
+  }
   if (amqpUrl && amqpExchange) {
     await logger.setAmqp(amqpUrl, amqpExchange);
   }
