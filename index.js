@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+const NEED_LICENSE = false;
+
 require('dotenv').config();
 const path = require('node:path');
 const fs = require('node:fs/promises');
@@ -10,8 +12,9 @@ const yargs = require('yargs/yargs');
 const { machineId } = require('node-machine-id');
 const { hideBin } = require('yargs/helpers');
 
-const logger = require('./lib/logger');
 const pjson = require('./package.json');
+const logger = require('./lib/logger');
+const license = require('./lib/license');
 
 const { argv } = yargs(hideBin(process.argv))
   .version(pjson.version)
@@ -51,6 +54,12 @@ const { argv } = yargs(hideBin(process.argv))
   })
   .options('dump-machine-id', {
     type: 'boolean',
+  })
+  .options('generate-build-json', {
+    type: 'boolean',
+  })
+  .options('generate-license', {
+    type: 'string',
   })
   .check((args) => {
     if (Array.isArray(args.port)) {
@@ -93,7 +102,13 @@ const {
   amqpExchange,
   silent,
   dumpMachineId,
+  generateBuildJson,
+  generateLicense,
 } = argv;
+
+// eslint-disable-next-line no-console
+// console.log(JSON.stringify(argv, null, 2));
+// process.exit(0);
 
 const app = express();
 app.use(compression());
@@ -161,6 +176,45 @@ app.use((req, res) => {
 
     process.exit(0);
   }
+
+  if (generateBuildJson) {
+    const privateKey = (await fs.readFile('private.pem')).toString();
+    const publicKey = (await fs.readFile('public.pem')).toString();
+    // eslint-disable-next-line no-console
+    console.log(JSON.stringify({ privateKey, publicKey }, null, 2));
+    process.exit(0);
+  }
+
+  if (generateLicense) {
+    const licenseContent = await license.generateLicense(generateLicense);
+    // eslint-disable-next-line no-console
+    console.log(licenseContent);
+    process.exit(0);
+  }
+
+  if (NEED_LICENSE) {
+    try {
+      const licenseData = (await fs.readFile('license.dat')).toString().trim();
+
+      const isValid = await license.verifyLicense(
+        await machineId(),
+        licenseData,
+      );
+
+      if (!isValid) {
+        throw new Error('INVALID_LICENSE');
+      }
+    } catch (e) {
+      logger.log({
+        ts: new Date(),
+        pid: process.pid,
+        machineId: await machineId(),
+        msg: 'INVALID LICENSE',
+      });
+      process.exit(1);
+    }
+  }
+
   if (amqpUrl && amqpExchange) {
     await logger.setAmqp(amqpUrl, amqpExchange);
   }
