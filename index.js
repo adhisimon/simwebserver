@@ -18,6 +18,11 @@ const license = require('./lib/license');
 
 const { argv } = yargs(hideBin(process.argv))
   .version(pjson.version)
+  .options('host', {
+    type: 'string',
+    default: process.env.SWS_HOST || null,
+    describe: 'also obey SWS_HOST env',
+  })
   .options('port', {
     type: 'number',
     default: Number(process.env.SWS_PORT) || 8080,
@@ -105,6 +110,7 @@ const { argv } = yargs(hideBin(process.argv))
   .strict();
 
 const {
+  host,
   port,
   workDir,
   terminateAfterSeconds,
@@ -245,11 +251,13 @@ app.use((req, res) => {
     await logger.setAmqp(amqpUrl, amqpExchange);
   }
 
-  app.listen(port, async () => {
+  app.listen(port, host, async () => {
     logger.log({
       ts: new Date(),
       pid: process.pid,
       msg: 'Ready to served',
+      host,
+      port,
     });
 
     if (argv.pidfile) {
