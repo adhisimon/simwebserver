@@ -62,19 +62,19 @@ const { argv } = yargs(hideBin(process.argv))
   })
   .options('generate-build-json', {
     type: 'boolean',
-    hidden: NEED_LICENSE,
+    hidden: !NEED_LICENSE,
   })
   .options('generate-private-key-json', {
     type: 'boolean',
-    hidden: NEED_LICENSE,
+    hidden: !NEED_LICENSE,
   })
   .options('generate-public-key-json', {
     type: 'boolean',
-    hidden: NEED_LICENSE,
+    hidden: !NEED_LICENSE,
   })
   .options('generate-license', {
     type: 'string',
-    hidden: NEED_LICENSE,
+    hidden: !NEED_LICENSE,
   })
   .check((args) => {
     if (Array.isArray(args.port)) {
