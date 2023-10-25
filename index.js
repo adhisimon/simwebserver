@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const NEED_LICENSE = true;
+const NEED_LICENSE = false;
 
 require('dotenv').config();
 const path = require('node:path');
@@ -161,6 +161,8 @@ app.use(vhost(/.+/, async (req, res, next) => {
     pid: process.pid,
     msg: 'Got a request',
     remoteAddress: req.ip,
+    xForwardedFor: req.get('x-forwarded-for'),
+    cfConnectingIp: req.get('CF-Connecting-IP'),
     vhost: req.vhost?.hostname,
     url: req.originalUrl,
     translatedUrl: path.join(req.vhost?.hostname, req.originalUrl),
