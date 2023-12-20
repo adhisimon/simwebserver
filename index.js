@@ -14,7 +14,6 @@ const { hideBin } = require('yargs/helpers');
 const SingleInstance = require('single-instance');
 
 const pjson = require('./package.json');
-const logger = require('./lib/logger');
 const license = require('./lib/license');
 
 const { argv } = yargs(hideBin(process.argv))
@@ -133,67 +132,6 @@ const {
 // console.log(JSON.stringify(argv, null, 2));
 // process.exit(0);
 
-const app = express();
-app.use(compression());
-
-if (silent) {
-  logger.setSilent(silent);
-}
-
-if (terminateAfterSeconds) {
-  setTimeout(() => {
-    logger.log({
-      ts: new Date(),
-      pid: process.pid,
-      msg: `Terminated after running ${terminateAfterSeconds} secs`,
-    });
-    process.exit(0);
-  }, terminateAfterSeconds * 1000);
-}
-
-app.use(vhost(/.+/, async (req, res, next) => {
-  try {
-    const vhostDirStats = await fs.stat(path.join(workDir, req.vhost?.hostname));
-    if (vhostDirStats.isDirectory()) {
-      req.url = path.join(req.vhost?.hostname, req.path);
-    }
-  } catch (e) {
-    //
-  }
-
-  logger.log({
-    ts: new Date(),
-    pid: process.pid,
-    msg: 'Got a request',
-    remoteAddress: req.ip,
-    xForwardedFor: req.get('x-forwarded-for'),
-    cfConnectingIp: req.get('CF-Connecting-IP'),
-    vhost: req.vhost?.hostname,
-    url: req.originalUrl,
-    translatedUrl: path.join(req.vhost?.hostname, req.originalUrl),
-  });
-
-  next();
-}));
-
-app.use(express.static(workDir));
-
-app.use((req, res) => {
-  res.status(404).json({
-    status: 404,
-    msg: 'Not found',
-    vhost: req.vhost?.hostname,
-    url: req.originalUrl,
-  });
-
-  logger.log({
-    ts: new Date(),
-    msg: '404 NOT FOUND',
-    vhost: req.vhost?.hostname,
-    url: req.originalUrl,
-  });
-});
-
 (async () => {
   if (dumpMachineId) {
     // eslint-disable-next-line no-console
@@ -244,12 +182,8 @@ app.use((req, res) => {
         throw new Error('INVALID_LICENSE');
       }
     } catch (e) {
-      logger.log({
-        ts: new Date(),
-        pid: process.pid,
-        machineId: await machineId(),
-        msg: 'INVALID LICENSE',
-      });
+      // eslint-disable-next-line no-console
+      console.log('INVALID LICENSE');
       process.exit(1);
     }
   }
@@ -265,9 +199,72 @@ app.use((req, res) => {
     }
   }
 
+  // eslint-disable-next-line global-require
+  const logger = require('./lib/logger');
+
+  if (silent) {
+    logger.setSilent(silent);
+  }
+
+  if (terminateAfterSeconds) {
+    setTimeout(() => {
+      logger.log({
+        ts: new Date(),
+        pid: process.pid,
+        msg: `Terminated after running ${terminateAfterSeconds} secs`,
+      });
+      process.exit(0);
+    }, terminateAfterSeconds * 1000);
+  }
+
   if (amqpUrl && amqpExchange) {
     await logger.setAmqp(amqpUrl, amqpExchange);
   }
+  const app = express();
+  app.use(compression());
+
+  app.use(vhost(/.+/, async (req, res, next) => {
+    try {
+      const vhostDirStats = await fs.stat(path.join(workDir, req.vhost?.hostname));
+      if (vhostDirStats.isDirectory()) {
+        req.url = path.join(req.vhost?.hostname, req.path);
+      }
+    } catch (e) {
+      //
+    }
+
+    logger.log({
+      ts: new Date(),
+      pid: process.pid,
+      msg: 'Got a request',
+      remoteAddress: req.ip,
+      xForwardedFor: req.get('x-forwarded-for'),
+      cfConnectingIp: req.get('CF-Connecting-IP'),
+      vhost: req.vhost?.hostname,
+      url: req.originalUrl,
+      translatedUrl: path.join(req.vhost?.hostname, req.originalUrl),
+    });
+
+    next();
+  }));
+
+  app.use(express.static(workDir));
+
+  app.use((req, res) => {
+    res.status(404).json({
+      status: 404,
+      msg: 'Not found',
+      vhost: req.vhost?.hostname,
+      url: req.originalUrl,
+    });
+
+    logger.log({
+      ts: new Date(),
+      msg: '404 NOT FOUND',
+      vhost: req.vhost?.hostname,
+      url: req.originalUrl,
+    });
+  });
 
   app.listen(port, host, async () => {
     logger.log({
