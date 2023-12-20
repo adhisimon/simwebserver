@@ -135,3 +135,5 @@ public.pem
 license.dat
 private.json
 public.json
+
+tmp/

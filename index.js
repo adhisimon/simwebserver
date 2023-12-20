@@ -80,6 +80,11 @@ const { argv } = yargs(hideBin(process.argv))
     type: 'string',
     hidden: !NEED_LICENSE,
   })
+  .options('process-title', {
+    type: 'string',
+    describe: 'change process title to this string',
+    default: process.env.SWS_PROCESS_TITLE,
+  })
   .check((args) => {
     if (Array.isArray(args.port)) {
       return 'Too many arguments: port';
@@ -131,6 +136,10 @@ const {
 // eslint-disable-next-line no-console
 // console.log(JSON.stringify(argv, null, 2));
 // process.exit(0);
+
+if (argv.processTitle) {
+  process.title = argv.processTitle;
+}
 
 (async () => {
   if (dumpMachineId) {
