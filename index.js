@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const NEED_LICENSE = true;
+const NEED_LICENSE = false;
 
 require('dotenv').config();
 const path = require('node:path');
