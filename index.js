@@ -11,6 +11,10 @@ const vhost = require('vhost');
 const yargs = require('yargs/yargs');
 const { machineId } = require('node-machine-id');
 const { hideBin } = require('yargs/helpers');
+const util = require('util');
+const lockFile = require('lockfile');
+
+const lockFileLock = util.promisify(lockFile.lock);
 
 const pjson = require('./package.json');
 const logger = require('./lib/logger');
@@ -56,6 +60,10 @@ const { argv } = yargs(hideBin(process.argv))
   .options('pidfile', {
     type: 'string',
     default: process.env.SWS_PIDFILE,
+  })
+  .options('lockfile', {
+    type: 'string',
+    default: process.env.SWS_LOCKFILE,
   })
   .options('dump-machine-id', {
     type: 'boolean',
@@ -245,6 +253,16 @@ app.use((req, res) => {
         machineId: await machineId(),
         msg: 'INVALID LICENSE',
       });
+      process.exit(1);
+    }
+  }
+
+  if (argv.lockfile) {
+    try {
+      await lockFileLock(argv.lockfile, {});
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log(`LOCKFILE (${argv.lockfile}) existed`);
       process.exit(1);
     }
   }
