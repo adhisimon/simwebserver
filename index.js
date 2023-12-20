@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const NEED_LICENSE = false;
+const NEED_LICENSE = true;
 
 require('dotenv').config();
 const path = require('node:path');
@@ -11,10 +11,7 @@ const vhost = require('vhost');
 const yargs = require('yargs/yargs');
 const { machineId } = require('node-machine-id');
 const { hideBin } = require('yargs/helpers');
-const util = require('util');
-const lockFile = require('lockfile');
-
-const lockFileLock = util.promisify(lockFile.lock);
+const SingleInstance = require('single-instance');
 
 const pjson = require('./package.json');
 const logger = require('./lib/logger');
@@ -61,9 +58,9 @@ const { argv } = yargs(hideBin(process.argv))
     type: 'string',
     default: process.env.SWS_PIDFILE,
   })
-  .options('lockfile', {
+  .options('lockname', {
     type: 'string',
-    default: process.env.SWS_LOCKFILE,
+    default: process.env.SWS_LOCKNAME,
   })
   .options('dump-machine-id', {
     type: 'boolean',
@@ -257,12 +254,13 @@ app.use((req, res) => {
     }
   }
 
-  if (argv.lockfile) {
+  if (argv.lockname) {
     try {
-      await lockFileLock(argv.lockfile, {});
+      const locker = new SingleInstance('my-app-name');
+      await locker.lock();
     } catch (e) {
       // eslint-disable-next-line no-console
-      console.log(`LOCKFILE (${argv.lockfile}) existed`);
+      console.log(`${e.message || e.toString()} (${argv.lockname})`);
       process.exit(1);
     }
   }
