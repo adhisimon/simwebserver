@@ -275,5 +275,7 @@ app.use((req, res) => {
       console.log(`ECODE: ${e.code}`);
       // eslint-disable-next-line no-console
       console.log(`EMESSAGE: ${e.message || e.toString()}`);
+
+      process.exit(1);
     });
 })();
