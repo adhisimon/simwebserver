@@ -8,7 +8,8 @@
     "postversion": "git push && git push --tags",
     "version": "auto-changelog -p && git add CHANGELOG.md",
     "build": "pkg --targets linux-x64,win-x64,mac-x64 --output dist/simwebserver-x64 --compress Brotli index.js",
-    "build-linux-x64": "pkg --targets node18-linux-x64 --output dist/simwebserver-x64-linux --compress Brotli index.js"
+    "build-linux-x64": "pkg --targets node18-linux-x64 --output dist/simwebserver-x64-linux --compress Brotli index.js",
+    "build-need-license": "pkg --targets node18-linux-x64 --output dist/simwebserver-x64-linux-licensed --compress Brotli index-need-license.js"
   },
   "repository": {
     "type": "git",
